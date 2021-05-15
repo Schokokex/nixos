@@ -4,18 +4,39 @@
 
 { config, pkgs, ... }:
 
+let
+  nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
+    export __NV_PRIME_RENDER_OFFLOAD=1
+    export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export __VK_LAYER_NV_optimus=NVIDIA_only
+    exec -a "$0" "$@"
+  '';
+in
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
 
+  nixpkgs.config.allowUnfree = true;
+  hardware.opengl.driSupport32Bit = true;
+  environment.systemPackages = [ nvidia-offload ];
+  services.xserver.videoDrivers = [  "nvidia" ];
+  hardware.nvidia.prime = {
+    offload.enable = true;
+    # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
+    nvidiaBusId = "PCI:1:0:0";
+    # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
+    intelBusId = "PCI:0:2:0";
+  };
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   # networking.hostName = "nixos"; # Define your hostname.
-  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
@@ -42,9 +63,9 @@
   services.xserver.enable = true;
 
 
-  # Enable the Plasma 5 Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
-  services.xserver.desktopManager.plasma5.enable = true;
+  # Enable the GNOME 3 Desktop Environment.
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome3.enable = true;
   
 
   # Configure keymap in X11
@@ -69,31 +90,10 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  services.flatpak.enable = true;
-  environment.systemPackages = with pkgs; [
-    wget
-    lutris
-    firefox
-  ];
-  programs.steam.enable = true;
-  nixpkgs.config.allowUnfree = true;
-
-
-  hardware.opengl.driSupport32Bit = true;
-
-
-  services.xserver.videoDrivers = [ "nvidia" ];
-
-  hardware.nvidia.prime = {
-    sync.enable = true;
-
-    # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
-    nvidiaBusId = "PCI:1:0:0";
-
-    # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
-    intelBusId = "PCI:0:2:0";
-  };
-
+  # environment.systemPackages = with pkgs; [
+  #   wget vim
+  #   firefox
+  # ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -123,3 +123,4 @@
   system.stateVersion = "20.09"; # Did you read the comment?
 
 }
+
