@@ -67,9 +67,8 @@
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "a";
   users.users.a = {
-    name = "Administrator";
     isNormalUser = true;
-    initialPassword = "asd" ;
+    initialPassword = "" ;
   #   extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
   };
 
