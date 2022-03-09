@@ -26,9 +26,9 @@ mount $targetdev'2' /mnt/btrfs
 btrfs subvolume create /mnt/btrfs/@nix
 btrfs subvolume create /mnt/btrfs/home
 btrfs subvolume create /mnt/btrfs/etc
-cp -r dev/sda2/ETC/nixos /mnt/btrfs/etc/
-cp -r dev/sda2/HOME/a /mnt/btrfs/home/
-chown -R 1000:100 /mnt/btrfs/home/a
+cp -r dev/sda2/ETC/* /mnt/btrfs/etc/
+cp -r dev/sda2/HOME/* /mnt/btrfs/home/
+chown -R 1000:100 /mnt/btrfs/home/*
 
 echo making configuration readonly
 btrfs subvolume snapshot -r /mnt/btrfs/home /mnt/btrfs/HOME
