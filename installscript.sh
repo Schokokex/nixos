@@ -19,8 +19,8 @@ mount $targetdev'2' asd
 btrfs subvolume create asd/@nix
 btrfs subvolume create asd/home
 btrfs subvolume create asd/etc
-cp -r /dev/sda2/ETC/nixos asd/etc/
-cp -r /dev/sda2/HOME/a asd/home/
+cp -r dev/sda2/ETC/nixos asd/etc/
+cp -r dev/sda2/HOME/a asd/home/
 
 echo making configuration readonly
 btrfs subvolume snapshot -r asd/home asd/HOME
