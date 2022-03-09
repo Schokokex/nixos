@@ -28,6 +28,7 @@ btrfs subvolume create /mnt/btrfs/home
 btrfs subvolume create /mnt/btrfs/etc
 cp -r dev/sda2/ETC/nixos /mnt/btrfs/etc/
 cp -r dev/sda2/HOME/a /mnt/btrfs/home/
+chown -R 1000:100 /mnt/btrfs/home/a
 
 echo making configuration readonly
 btrfs subvolume snapshot -r /mnt/btrfs/home /mnt/btrfs/HOME
