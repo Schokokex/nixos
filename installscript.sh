@@ -1,31 +1,38 @@
 #!/bin/sh
 which nixos-install >/dev/null || exit
 targetdev=/dev/sda
-echo this will wipe $targetdev. [Ctrl-C] to cancel && read || exit
+echo this will wipe $targetdev. [Ctrl-C] to cancel or [Enter] to continue && read || exit
 
-echo wiping $targetdev
-sleep 3
+
+echo unmounting $targetdev1/2/3
+while $(umount $targetdev'1'); do echo unmounting $targetdev'1'; done
+while $(umount $targetdev'2'); do echo unmounting $targetdev'2'; done 
+while $(umount $targetdev'3'); do echo unmounting $targetdev'3'; done 
+
+echo cleaning /mnt
+rm -rf /mnt
+mkdir /mnt || exit
 
 parted $targetdev -- mklabel gpt
 parted $targetdev -- mkpart ESP fat32 1MiB 1GiB
 parted $targetdev -- set 1 esp on
 mkfs.fat -F 32 -n EFI $targetdev'1'
 parted $targetdev -- mkpart primary 1GiB 100%
-mkfs.btrfs -L btrfs $targetdev'2'
+mkfs.btrfs -L btrfs -f $targetdev'2'
 
 echo copy configuration to hard drive
-mkdir asd
-mount $targetdev'2' asd
-btrfs subvolume create asd/@nix
-btrfs subvolume create asd/home
-btrfs subvolume create asd/etc
-cp -r dev/sda2/ETC/nixos asd/etc/
-cp -r dev/sda2/HOME/a asd/home/
+mkdir /mnt/btrfs
+mount $targetdev'2' /mnt/btrfs
+btrfs subvolume create /mnt/btrfs/@nix
+btrfs subvolume create /mnt/btrfs/home
+btrfs subvolume create /mnt/btrfs/etc
+cp -r dev/sda2/ETC/nixos /mnt/btrfs/etc/
+cp -r dev/sda2/HOME/a /mnt/btrfs/home/
 
 echo making configuration readonly
-btrfs subvolume snapshot -r asd/home asd/HOME
-btrfs subvolume snapshot -r asd/etc asd/ETC
-btrfs subvolume delete asd/home
+btrfs subvolume snapshot -r /mnt/btrfs/home /mnt/btrfs/HOME
+btrfs subvolume snapshot -r /mnt/btrfs/etc /mnt/btrfs/ETC
+btrfs subvolume delete /mnt/btrfs/home
 
 echo preparing installation
 mkdir /mnt/boot
@@ -36,7 +43,7 @@ mount $targetdev'2' -o subvol=@nix /mnt/nix
 mount $targetdev'2' -o subvol=etc /mnt/etc
 
 echo installing
-nixos-install && btrfs subvolume delete asd/etc
+nixos-install && btrfs subvolume delete /mnt/btrfs/etc
 
 echo cleaning up
-umount asd && rmdir asd
+umount /mnt/btrfs && rmdir /mnt/btrfs
