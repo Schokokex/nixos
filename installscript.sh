@@ -1,5 +1,5 @@
 #!/bin/sh
-which nixos-install >/dev/null || exit
+which echo umount rm mkdir parted mkfs.fat mkfs.btrfs cp mount btrfs nixos-install rmdir >/dev/null || exit
 targetdev=/dev/sda
 echo this will wipe $targetdev. [Ctrl-C] to cancel or [Enter] to continue && read || exit
 
