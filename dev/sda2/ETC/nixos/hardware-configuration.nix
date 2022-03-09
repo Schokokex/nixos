@@ -20,13 +20,13 @@
     };
 
   fileSystems."/nix" =
-    { device = "/dev/disk/by-uuid/09ec36e4-117e-49cf-9bbb-f2b1a0215d71";
+    { device = "/dev/disk/by-label/btrfs";
       fsType = "btrfs";
       options = [ "subvol=@nix" ];
     };
 
   fileSystems."/.etc-lower" =
-    { device = "/dev/disk/by-uuid/09ec36e4-117e-49cf-9bbb-f2b1a0215d71";
+    { device = "/dev/disk/by-label/btrfs";
       fsType = "btrfs";
       neededForBoot = true;
       options = [
@@ -36,7 +36,7 @@
     };
 
   fileSystems."/.home-lower" =
-    { device = "/dev/disk/by-uuid/09ec36e4-117e-49cf-9bbb-f2b1a0215d71";
+    { device = "/dev/disk/by-label/btrfs";
       fsType = "btrfs";
       neededForBoot = true;
       options = [
@@ -46,7 +46,7 @@
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/00C2-275C";
+    { device = "/dev/disk/by-label/EFI";
       fsType = "vfat";
     };
 
@@ -85,3 +85,4 @@
 
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
+
